@@ -1,29 +1,20 @@
-import requests
-import json
+from ollama import chat, ChatResponse
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3"
+# MODEL = "llama3-chatqa"
+MODEL = "deepseek-r1:8b"
 
-def test_ollama_api():
-    prompt = "Tell me the captial of India?"
-    payload = {
-        "model" : MODEL_NAME,
-        "prompt" : prompt,
-        "stream" : False
-    }
+# # No streaming
+# response = chat(
+#     model = MODEL, messages= [{'role' : "user",'content' : "Why is sky blue?"}]
+#     )
+# print(response["message"]["content"])
 
-    try:
-        response = requests.post(OLLAMA_API_URL, json=payload)
-        if response.status_code == 200:
-            print("API call successful!")
-            data = response.json()["response"]
-            print("Response:", json.dumps(data, indent=2))
-        else:
-            print("API call failed with status code:", response.status_code)
-            print("Response content:", response.text)
-    except requests.exceptions.RequestException as e:
-        print("Error connecting to Ollama API:", str(e), print(response.text))
-    
-if __name__ == "__main__":
-    print("Testing Ollama API...")
-    test_ollama_api()
+# With streaming
+stream_response = chat(
+    model = MODEL,
+    messages = [{"role":"user", "content":"Why do you think high cortisol levels are bad for men?"}],
+    stream = True
+)
+
+for chunk in stream_response:
+    print(chunk['message']['content'], end='', flush=True)
